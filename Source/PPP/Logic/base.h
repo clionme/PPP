@@ -11,6 +11,7 @@
 using namespace std;
 
 #define TURN_PERIOD_BASE 100
+#define MAP_SIZE 7
 
 struct Pos {
 	Pos(int x, int y) : x_(x), y_(y) {};
@@ -66,15 +67,60 @@ class UnitGroup;
 class IDManager;
 
 
-class Cell {
-public:
-	Cell::Cell( Pos p ) : p_(p) {};
-	string toStr_();
-
+struct CellInfo {
+	CellInfo::CellInfo(Pos p, int height) 
+		: p_(p), height_(height) {};
 	Pos p_;
-	Unit* unit_ = NULL;
+	int height_;
+public:
+	Pos getPos_() { return p_; };
+	int getHeight_() { return height_; };
 };
 
+
+class Cell {
+public:
+	Cell::Cell( Pos p, int height ) 
+		: info_(CellInfo(p, height)) {};
+	string toStr_();
+
+	CellInfo info_;	
+	Unit* unit_ = NULL;
+	Pos getPos_() { return info_.getPos_(); }
+	CellInfo getInfo_() { return info_; }
+};
+
+
+class MapGenerator {
+	const static int componentSize_ = 3;
+	vector<vector<vector<int>>> components_
+		= {
+			{
+				{ 3,4,3 },
+				{ 2,3,2 },
+				{ 1,0,1 },
+			},{
+				{ 3,0,1 },
+				{ 2,1,1 },
+				{ 1,0,0 },
+			},{
+				{ 3,3,2 },
+				{ 3,4,1 },
+				{ 0,1,1 },
+			},{
+				{ 3,2,1 },
+				{ 2,1,2 },
+				{ 3,0,3 },
+			},{
+				{ 0,0,0 },
+				{ 1,0,0 },
+				{ 0,0,1 },
+			},
+	};
+
+public:
+	map<Pos, int> generateHeightMap_(int xSize, int ySize);
+};
 
 class Grid {
 private:
@@ -93,7 +139,7 @@ public:
 	vector<Pos> getUseCandidates_(ItemClass&, Pos);
 	vector<Unit*> getUnits_();
 	Unit* getUnitAt_(Pos&);
-	vector<Pos> getCellInfo_();
+	vector<CellInfo> getCellInfo_();
 		
 	int xMax_, yMax_;
 };
@@ -149,7 +195,7 @@ public:
 	}
 	Pos getPos_() {
 		if (at_)
-			return at_->p_;
+			return at_->getPos_();
 		return Pos(-1, -1);
 	}
 	int onAttacked_(Unit*, ItemClass&);

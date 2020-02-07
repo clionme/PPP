@@ -14,8 +14,10 @@ void APPPGameMode::SetCell(ViewerEvent evt)
 	FVector orig = FVector(0.0f, 0.0f, 0.0f);
 
 	for (auto cellInfo : evt.cell_) {		
+		auto infoPos = cellInfo.getPos_();
 		ACell *added = (ACell*)GetWorld()->SpawnActor(ACell::StaticClass(), &orig);
-		FIntPoint pos = FIntPoint(cellInfo.x_, cellInfo.y_);
+		FIntPoint pos = FIntPoint(infoPos.x_, infoPos.y_);
+		added->setCellHeight(cellInfo.getHeight_());
 		added->setPos(pos);
 		CellMap.Add(pos, added);
 	}
@@ -34,6 +36,14 @@ void APPPGameMode::SetUnit(ViewerEvent evt)
 		UnitMap.Add(added->ID, added);
 	}
 };
+
+FVector APPPGameMode::GetCellPos(FIntPoint p) {	
+	ACell* cell = GetCell(p);
+	if (cell) {
+		return cell->GetActorLocation();
+	}
+	return FVector();
+}
 
 void APPPGameMode::ClearStage()
 {

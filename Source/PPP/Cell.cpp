@@ -28,6 +28,7 @@ ACell::ACell()
 	{		
 		VisualMesh->SetStaticMesh(meshAsset.Object);
 		VisualMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		VisualMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 4.0f));
 	}
 }
 
@@ -43,7 +44,7 @@ void ACell::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (Reachable || Actable) {
-		FVector loc = GetActorLocation() + FVector(0, 0, 110);
+		FVector loc = GetActorLocation() + FVector(0, 0, 410);
 		FVector size = FVector(45, 45, 2);
 
 		FColor color;
@@ -61,6 +62,13 @@ void ACell::Tick(float DeltaTime)
 
 		DrawDebugBox(GetWorld(), loc, size, color, false, -1, 0, 5);
 	}
+}
+
+void ACell::setCellHeight(int height)
+{
+	FVector loc = GetActorLocation();
+	loc.Z = (float)height * 110.0f / 2.0f;	
+	SetActorLocation(loc);
 }
 
 void ACell::setPos(FIntPoint p)

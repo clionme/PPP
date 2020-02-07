@@ -51,6 +51,8 @@ public:
 
 	LogicEventToken EventToken;
 
+	FVector GetCellPos(FIntPoint);
+
 	void StartMoveTargetSelection();
 	void EndMoveTargetSelection();
 

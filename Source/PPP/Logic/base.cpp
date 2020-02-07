@@ -11,15 +11,44 @@ string Cell::toStr_() {
 	return sub;
 }
 
+map<Pos, int> MapGenerator::generateHeightMap_(int xSize, int ySize) {
+	map<Pos, int> heightMap;
+	int segmentSize = componentSize_ + 1;
+	for (int sgmX = 0; sgmX <= xSize / segmentSize; sgmX++) {
+		for (int sgmY = 0; sgmY <= ySize / segmentSize; sgmY++) {
+			int compN = rand() % components_.size();
+			int y = sgmY * segmentSize;
+			for (auto row : components_[compN]) {
+				int x = sgmX * segmentSize;
+				for (int height : row) {
+					heightMap.insert(make_pair(Pos(x, y), height));
+					x += 1;
+				}
+				y += 1;
+			}
+		}
+	}
+	return heightMap;
+};
 
 Grid::Grid(int xin, int yin) {
 	xMax_ = xin;
 	yMax_ = yin;
 
+	auto gen = MapGenerator();
+
+	map<Pos, int> heightMap = gen.generateHeightMap_(xin, yin);
+
 	for (int x = 0; x < xin; x++) {
 		vector<Cell> sub;
 		for (int y = 0; y < yin; y++) {
-			sub.push_back(Cell( Pos(x, y) ));
+			Pos p = Pos(x, y);
+			int height = 0;
+			try {
+				height = heightMap[p];
+			}
+			catch (const out_of_range&) {}
+			sub.push_back(Cell( p, height));
 		}
 		vCell_.push_back(sub);
 	}
@@ -212,11 +241,11 @@ Unit* Grid::getUnitAt_(Pos & pos) {
 }
 
 
-vector<Pos> Grid::getCellInfo_() {
-	vector<Pos> ret;
+vector<CellInfo> Grid::getCellInfo_() {
+	vector<CellInfo> ret;
 	for (int y = 0; y < yMax_; y++) {
 		for (int x = 0; x < xMax_; x++) {
-			ret.push_back( vCell_[x][y].p_ );
+			ret.push_back( vCell_[x][y].getInfo_() );
 		}
 	}
 	return ret;

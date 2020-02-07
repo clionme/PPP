@@ -48,6 +48,7 @@ public:
 	void Destroy();
 	void DestroyInfoText();
 
+	FVector GetCellPos(FIntPoint);
 	void AdjustPos(float x, float y, float z);
 	void SetUnitInfo(int, int, int);
 	void SetInfoText(FText);

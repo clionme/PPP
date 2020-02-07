@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #define DUR_BASE 0.25f
-#define CELL_SIZE 110.0f
 #define TEXT_OFFSET FVector(0.0f, 0.0f, 150.0f)
 
 #include "Unit.h"
 
+#include "PPPGameMode.h"
 #include "Components/StaticMeshComponent.h"
 #include "ConstructorHelpers.h"
 #include "Engine/World.h"
@@ -136,16 +136,26 @@ void AUnit::Tick(float DeltaTime)
 				int next = cur + 1;
 				if (pEventToken->Path.IsValidIndex(cur) &&
 					pEventToken->Path.IsValidIndex(next)) {
-					FIntPoint diff = pEventToken->Path[next] - pEventToken->Path[cur];
+
+					FVector diff = GetCellPos(pEventToken->Path[next]) 
+						- GetCellPos(pEventToken->Path[cur]);					
 					AdjustPos(
-						CELL_SIZE * diff.X * DeltaTime / DUR_BASE,
-						CELL_SIZE * diff.Y * DeltaTime / DUR_BASE,
-						0.0f);
+						diff.X * DeltaTime / DUR_BASE,
+						diff.Y * DeltaTime / DUR_BASE,
+						diff.Z * DeltaTime / DUR_BASE );
 				}
 			}
 			break;
 		}
 	}
+}
+
+FVector AUnit::GetCellPos(FIntPoint p) {
+	APPPGameMode* gameMode = Cast<APPPGameMode>(GetWorld()->GetAuthGameMode());
+	if (gameMode) {
+		return gameMode->GetCellPos(p);
+	}
+	return FVector();
 }
 
 void AUnit::AdjustPos(float x, float y, float z) {
@@ -191,10 +201,9 @@ void AUnit::SetInfoText(FText text) {
 
 void AUnit::setPos(FIntPoint p)
 {
-	FVector loc = GetActorLocation();
-	loc.X = (float)p.X * CELL_SIZE;
-	loc.Y = (float)p.Y * CELL_SIZE;
-	loc.Z = loc.Z + 150.0f;
+	FVector loc = GetCellPos(p);
+	loc.Z = loc.Z + 450.0f;
+
 	SetActorLocation(loc);
 	if(InfoText)
 		InfoText->SetActorRelativeLocation(GetActorLocation() + TEXT_OFFSET);

@@ -91,7 +91,7 @@ public:
 	int targetUnitID_;
 	int value = 0;
 	vector<Pos> path_;
-	vector<Pos> cell_;
+	vector<CellInfo> cell_;
 	map<int, UnitInfo> unit_;
 
 	vector<Pos> reachable_;

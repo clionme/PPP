@@ -361,7 +361,7 @@ vector<ViewerEvent> Game::setupStage_(){
 		unitMap[id] = otherUnits_.getUnit(id);
 	}
 	
-	st_ = Stage(unitMap, 5);
+	st_ = Stage(unitMap, MAP_SIZE);
 	st_.initialize_();
 
 	vector<ViewerEvent> events;
